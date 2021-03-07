@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Heap.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">algs4</a> &gt; <a href="index.source.html" class="el_package">edu.princeton.cs.algs4.sorting</a> &gt; <span class="el_source">Heap.java</span></div><h1>Heap.java</h1><pre class="source lang-java linenums">/******************************************************************************
+ *  Compilation:  javac Heap.java
+ *  Execution:    java Heap &lt; input.txt
+ *  Dependencies: StdOut.java StdIn.java
+ *  Data files:   https://algs4.cs.princeton.edu/24pq/tiny.txt
+ *                https://algs4.cs.princeton.edu/24pq/words3.txt
+ *  
+ *  Sorts a sequence of strings from standard input using heapsort.
+ *
+ *  % more tiny.txt
+ *  S O R T E X A M P L E
+ *
+ *  % java Heap &lt; tiny.txt
+ *  A E E L M O P R S T X                 [ one string per line ]
+ *
+ *  % more words3.txt
+ *  bed bug dad yes zoo ... all bad yet
+ *
+ *  % java Heap &lt; words3.txt
+ *  all bad bed bug dad ... yes yet zoo   [ one string per line ]
+ *
+ ******************************************************************************/
+
+package edu.princeton.cs.algs4.sorting;
+
+
+/**
+ *  The {@code Heap} class provides a static method to sort an array
+ *  using &lt;em&gt;heapsort&lt;/em&gt;.
+ *  &lt;p&gt;
+ *  This implementation takes &amp;Theta;(&lt;em&gt;n&lt;/em&gt; log &lt;em&gt;n&lt;/em&gt;) time
+ *  to sort any array of length &lt;em&gt;n&lt;/em&gt; (assuming comparisons
+ *  take constant time). It makes at most 
+ *  2 &lt;em&gt;n&lt;/em&gt; log&lt;sub&gt;2&lt;/sub&gt; &lt;em&gt;n&lt;/em&gt; compares.
+ *  &lt;p&gt;
+ *  This sorting algorithm is not stable.
+ *  It uses &amp;Theta;(1) extra memory (not including the input array).
+ *  &lt;p&gt;
+ *  For additional documentation, see
+ *  &lt;a href=&quot;https://algs4.cs.princeton.edu/24pq&quot;&gt;Section 2.4&lt;/a&gt; of
+ *  &lt;i&gt;Algorithms, 4th Edition&lt;/i&gt; by Robert Sedgewick and Kevin Wayne.
+ *
+ *  @author Robert Sedgewick
+ *  @author Kevin Wayne
+ */
+public class Heap {
+
+    // This class should not be instantiated.
+    private Heap() { }
+
+    /**
+     * Rearranges the array in ascending order, using the natural order.
+     * @param pq the array to be sorted
+     */
+    public static void sort(Comparable[] pq) {
+<span class="nc" id="L56">        int n = pq.length;</span>
+
+        // heapify phase
+<span class="nc bnc" id="L59" title="All 2 branches missed.">        for (int k = n/2; k &gt;= 1; k--)</span>
+<span class="nc" id="L60">            sink(pq, k, n);</span>
+
+        // sortdown phase
+<span class="nc" id="L63">        int k = n;</span>
+<span class="nc bnc" id="L64" title="All 2 branches missed.">        while (k &gt; 1) {</span>
+<span class="nc" id="L65">            exch(pq, 1, k--);</span>
+<span class="nc" id="L66">            sink(pq, 1, k);</span>
+        }
+<span class="nc" id="L68">    }</span>
+
+   /***************************************************************************
+    * Helper functions to restore the heap invariant.
+    ***************************************************************************/
+
+    private static void sink(Comparable[] pq, int k, int n) {
+<span class="nc bnc" id="L75" title="All 2 branches missed.">        while (2*k &lt;= n) {</span>
+<span class="nc" id="L76">            int j = 2*k;</span>
+<span class="nc bnc" id="L77" title="All 4 branches missed.">            if (j &lt; n &amp;&amp; less(pq, j, j+1)) j++;</span>
+<span class="nc bnc" id="L78" title="All 2 branches missed.">            if (!less(pq, k, j)) break;</span>
+<span class="nc" id="L79">            exch(pq, k, j);</span>
+<span class="nc" id="L80">            k = j;</span>
+<span class="nc" id="L81">        }</span>
+<span class="nc" id="L82">    }</span>
+
+   /***************************************************************************
+    * Helper functions for comparisons and swaps.
+    * Indices are &quot;off-by-one&quot; to support 1-based indexing.
+    ***************************************************************************/
+    private static boolean less(Comparable[] pq, int i, int j) {
+<span class="nc bnc" id="L89" title="All 2 branches missed.">        return pq[i-1].compareTo(pq[j-1]) &lt; 0;</span>
+    }
+
+    private static void exch(Object[] pq, int i, int j) {
+<span class="nc" id="L93">        Object swap = pq[i-1];</span>
+<span class="nc" id="L94">        pq[i-1] = pq[j-1];</span>
+<span class="nc" id="L95">        pq[j-1] = swap;</span>
+<span class="nc" id="L96">    }</span>
+}
+
+/******************************************************************************
+ *  Copyright 2002-2020, Robert Sedgewick and Kevin Wayne.
+ *
+ *  This file is part of algs4.jar, which accompanies the textbook
+ *
+ *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,
+ *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.
+ *      http://algs4.cs.princeton.edu
+ *
+ *
+ *  algs4.jar is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  algs4.jar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.
+ ******************************************************************************/
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>

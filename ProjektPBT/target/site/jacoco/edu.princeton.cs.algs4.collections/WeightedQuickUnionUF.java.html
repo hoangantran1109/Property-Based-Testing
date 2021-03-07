@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>WeightedQuickUnionUF.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">algs4</a> &gt; <a href="index.source.html" class="el_package">edu.princeton.cs.algs4.collections</a> &gt; <span class="el_source">WeightedQuickUnionUF.java</span></div><h1>WeightedQuickUnionUF.java</h1><pre class="source lang-java linenums">/******************************************************************************
+ *  Compilation:  javac WeightedQuickUnionUF.java
+ *  Execution:  java WeightedQuickUnionUF &lt; input.txt
+ *  Dependencies: StdIn.java StdOut.java
+ *  Data files:   https://algs4.cs.princeton.edu/15uf/tinyUF.txt
+ *                https://algs4.cs.princeton.edu/15uf/mediumUF.txt
+ *                https://algs4.cs.princeton.edu/15uf/largeUF.txt
+ *
+ *  Weighted quick-union (without path compression).
+ *
+ ******************************************************************************/
+
+package edu.princeton.cs.algs4.collections;
+
+
+/**
+ *  The {@code WeightedQuickUnionUF} class represents a &lt;em&gt;union–find data type&lt;/em&gt;
+ *  (also known as the &lt;em&gt;disjoint-sets data type&lt;/em&gt;).
+ *  It supports the classic &lt;em&gt;union&lt;/em&gt; and &lt;em&gt;find&lt;/em&gt; operations,
+ *  along with a &lt;em&gt;count&lt;/em&gt; operation that returns the total number
+ *  of sets.
+ *  &lt;p&gt;
+ *  The union-find data type models a collection of sets containing
+ *  &lt;em&gt;n&lt;/em&gt; elements, with each element in exactly one set.
+ *  The elements are named 0 through &lt;em&gt;n&lt;/em&gt;–1.
+ *  Initially, there are &lt;em&gt;n&lt;/em&gt; sets, with each element in its
+ *  own set. The &lt;em&gt;canonical element&lt;/em&gt; of a set
+ *  (also known as the &lt;em&gt;root&lt;/em&gt;, &lt;em&gt;identifier&lt;/em&gt;,
+ *  &lt;em&gt;leader&lt;/em&gt;, or &lt;em&gt;set representative&lt;/em&gt;)
+ *  is one distinguished element in the set. Here is a summary of
+ *  the operations:
+ *  &lt;ul&gt;
+ *  &lt;li&gt;&lt;em&gt;find&lt;/em&gt;(&lt;em&gt;p&lt;/em&gt;) returns the canonical element
+ *      of the set containing &lt;em&gt;p&lt;/em&gt;. The &lt;em&gt;find&lt;/em&gt; operation
+ *      returns the same value for two elements if and only if
+ *      they are in the same set.
+ *  &lt;li&gt;&lt;em&gt;union&lt;/em&gt;(&lt;em&gt;p&lt;/em&gt;, &lt;em&gt;q&lt;/em&gt;) merges the set
+ *      containing element &lt;em&gt;p&lt;/em&gt; with the set containing
+ *      element &lt;em&gt;q&lt;/em&gt;. That is, if &lt;em&gt;p&lt;/em&gt; and &lt;em&gt;q&lt;/em&gt;
+ *      are in different sets, replace these two sets
+ *      with a new set that is the union of the two.
+ *  &lt;li&gt;&lt;em&gt;count&lt;/em&gt;() returns the number of sets.
+ *  &lt;/ul&gt;
+ *  &lt;p&gt;
+ *  The canonical element of a set can change only when the set
+ *  itself changes during a call to &lt;em&gt;union&lt;/em&gt;&amp;mdash;it cannot
+ *  change during a call to either &lt;em&gt;find&lt;/em&gt; or &lt;em&gt;count&lt;/em&gt;.
+ *  &lt;p&gt;
+ *  This implementation uses &lt;em&gt;weighted quick union by size&lt;/em&gt;
+ *  (without path compression).
+ *  The constructor takes &amp;Theta;(&lt;em&gt;n&lt;/em&gt;), where &lt;em&gt;n&lt;/em&gt;
+ *  is the number of elements.
+ *  The &lt;em&gt;union&lt;/em&gt; and &lt;em&gt;find&lt;/em&gt;
+ *  operations  take &amp;Theta;(log &lt;em&gt;n&lt;/em&gt;) time in the worst
+ *  case. The &lt;em&gt;count&lt;/em&gt; operation takes &amp;Theta;(1) time.
+ *  &lt;p&gt;
+ *  For alternative implementations of the same API, see
+ *  {@link UF}, {@link QuickFindUF}, and {@link QuickUnionUF}.
+ *  For additional documentation, see
+ *  &lt;a href=&quot;https://algs4.cs.princeton.edu/15uf&quot;&gt;Section 1.5&lt;/a&gt; of
+ *  &lt;i&gt;Algorithms, 4th Edition&lt;/i&gt; by Robert Sedgewick and Kevin Wayne.
+ *
+ *  @author Robert Sedgewick
+ *  @author Kevin Wayne
+ */
+public class WeightedQuickUnionUF {
+    private int[] parent;   // parent[i] = parent of i
+    private int[] size;     // size[i] = number of elements in subtree rooted at i
+    private int count;      // number of components
+
+    /**
+     * Initializes an empty union-find data structure with
+     * {@code n} elements {@code 0} through {@code n-1}. 
+     * Initially, each elements is in its own set.
+     *
+     * @param  n the number of elements
+     * @throws IllegalArgumentException if {@code n &lt; 0}
+     */
+<span class="nc" id="L79">    public WeightedQuickUnionUF(int n) {</span>
+<span class="nc" id="L80">        count = n;</span>
+<span class="nc" id="L81">        parent = new int[n];</span>
+<span class="nc" id="L82">        size = new int[n];</span>
+<span class="nc bnc" id="L83" title="All 2 branches missed.">        for (int i = 0; i &lt; n; i++) {</span>
+<span class="nc" id="L84">            parent[i] = i;</span>
+<span class="nc" id="L85">            size[i] = 1;</span>
+        }
+<span class="nc" id="L87">    }</span>
+
+    /**
+     * Returns the number of sets.
+     *
+     * @return the number of sets (between {@code 1} and {@code n})
+     */
+    public int count() {
+<span class="nc" id="L95">        return count;</span>
+    }
+  
+    /**
+     * Returns the canonical element of the set containing element {@code p}.
+     *
+     * @param  p an element
+     * @return the canonical element of the set containing {@code p}
+     * @throws IllegalArgumentException unless {@code 0 &lt;= p &lt; n}
+     */
+    public int find(int p) {
+<span class="nc" id="L106">        validate(p);</span>
+<span class="nc bnc" id="L107" title="All 2 branches missed.">        while (p != parent[p])</span>
+<span class="nc" id="L108">            p = parent[p];</span>
+<span class="nc" id="L109">        return p;</span>
+    }
+
+    /**
+     * Returns true if the two elements are in the same set.
+     * 
+     * @param  p one element
+     * @param  q the other element
+     * @return {@code true} if {@code p} and {@code q} are in the same set;
+     *         {@code false} otherwise
+     * @throws IllegalArgumentException unless
+     *         both {@code 0 &lt;= p &lt; n} and {@code 0 &lt;= q &lt; n}
+     * @deprecated Replace with two calls to {@link #find(int)}.
+     */
+    @Deprecated
+    public boolean connected(int p, int q) {
+<span class="nc bnc" id="L125" title="All 2 branches missed.">        return find(p) == find(q);</span>
+    }
+
+    // validate that p is a valid index
+    private void validate(int p) {
+<span class="nc" id="L130">        int n = parent.length;</span>
+<span class="nc bnc" id="L131" title="All 4 branches missed.">        if (p &lt; 0 || p &gt;= n) {</span>
+<span class="nc" id="L132">            throw new IllegalArgumentException(&quot;index &quot; + p + &quot; is not between 0 and &quot; + (n-1));  </span>
+        }
+<span class="nc" id="L134">    }</span>
+
+    /**
+     * Merges the set containing element {@code p} with the 
+     * the set containing element {@code q}.
+     *
+     * @param  p one element
+     * @param  q the other element
+     * @throws IllegalArgumentException unless
+     *         both {@code 0 &lt;= p &lt; n} and {@code 0 &lt;= q &lt; n}
+     */
+    public void union(int p, int q) {
+<span class="nc" id="L146">        int rootP = find(p);</span>
+<span class="nc" id="L147">        int rootQ = find(q);</span>
+<span class="nc bnc" id="L148" title="All 2 branches missed.">        if (rootP == rootQ) return;</span>
+
+        // make smaller root point to larger one
+<span class="nc bnc" id="L151" title="All 2 branches missed.">        if (size[rootP] &lt; size[rootQ]) {</span>
+<span class="nc" id="L152">            parent[rootP] = rootQ;</span>
+<span class="nc" id="L153">            size[rootQ] += size[rootP];</span>
+        }
+        else {
+<span class="nc" id="L156">            parent[rootQ] = rootP;</span>
+<span class="nc" id="L157">            size[rootP] += size[rootQ];</span>
+        }
+<span class="nc" id="L159">        count--;</span>
+<span class="nc" id="L160">    }</span>
+
+}
+
+
+/******************************************************************************
+ *  Copyright 2002-2020, Robert Sedgewick and Kevin Wayne.
+ *
+ *  This file is part of algs4.jar, which accompanies the textbook
+ *
+ *      Algorithms, 4th edition by Robert Sedgewick and Kevin Wayne,
+ *      Addison-Wesley Professional, 2011, ISBN 0-321-57351-X.
+ *      http://algs4.cs.princeton.edu
+ *
+ *
+ *  algs4.jar is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  algs4.jar is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with algs4.jar.  If not, see http://www.gnu.org/licenses.
+ ******************************************************************************/
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.5.201910111838</span></div></body></html>
